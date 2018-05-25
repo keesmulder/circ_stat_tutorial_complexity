@@ -102,9 +102,19 @@ ggplot(data.frame(th = IC_times * pi / 12)) +
 ### Circular outcome regression
 
 
-```{r}
+Let's assume we want to get the circular value predicted by a linear one.  
 
+```{r}
+fisherB18
 ```
+
+Then, we can just do:
+
+```{r}
+lmc <- lm.circular(fisherB18$x, fisherB18$theta, init = 0, type = "c-l")
+lmc
+```
+
 
 
 

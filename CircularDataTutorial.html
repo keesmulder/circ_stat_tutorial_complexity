@@ -228,7 +228,16 @@ In <code>R</code>, we can get it, but we have to take the modulus of 24 hours to
 ## 18    27  91.8
 ## 19    84  55.2</code></pre>
 <p>Then, we can just do:</p>
-<pre class="r"><code>lmfit &lt;- lm(x ~ cos(theta) + sin(theta), data = fisherB18)</code></pre>
+<pre class="r"><code>fisherB18$theta &lt;- fisherB18$theta * pi / 180
+lmfit &lt;- lm(x ~ cos(theta) + sin(theta), data = fisherB18)
+lmfit</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = x ~ cos(theta) + sin(theta), data = fisherB18)
+## 
+## Coefficients:
+## (Intercept)   cos(theta)   sin(theta)  
+##       41.24        11.32        29.27</code></pre>
 </div>
 <div id="fitting-a-distribution" class="section level3">
 <h3>Fitting a distribution</h3>
@@ -261,6 +270,55 @@ vm_mles</code></pre>
 </div>
 <div id="circular-outcome-regression" class="section level3">
 <h3>Circular outcome regression</h3>
+<p>Let’s assume we want to get the circular value predicted by a linear one.</p>
+<pre class="r"><code>fisherB18</code></pre>
+<pre><code>##        theta     x
+## 1  5.7072267  28.0
+## 2  1.5882496  85.2
+## 3  1.5358897  80.5
+## 4  5.3232542   4.7
+## 5  6.0039326  45.9
+## 6  4.7123890  12.7
+## 7  1.1693706  72.5
+## 8  0.3665191  56.6
+## 9  4.9043752  31.5
+## 10 0.1396263 112.0
+## 11 3.5604717  20.0
+## 12 1.5009832  72.5
+## 13 5.8119464  16.0
+## 14 0.3141593  45.9
+## 15 0.9948377  32.6
+## 16 0.1047198  56.6
+## 17 0.1919862  52.6
+## 18 0.4712389  91.8
+## 19 1.4660766  55.2</code></pre>
+<p>Then, we can just do:</p>
+<pre class="r"><code>lmc &lt;- lm.circular(fisherB18$x, fisherB18$theta, init = 0, type = &quot;c-l&quot;)</code></pre>
+<pre><code>## Warning in as.circular(x): an object is coerced to the class 'circular' using default value for the following components:
+##   type: 'angles'
+##   units: 'radians'
+##   template: 'none'
+##   modulo: 'asis'
+##   zero: 0
+##   rotation: 'counter'
+## conversion.circularyradians0counter2pi</code></pre>
+<pre class="r"><code>lmc</code></pre>
+<pre><code>## 
+## Call:
+## lm.circular.cl(y = ..1, x = ..2, init = 0)
+## 
+## 
+##  Circular-Linear Regression 
+## 
+##  Coefficients:
+##      Estimate Std. Error t value Pr(&gt;|t|)
+## [1,]   -1.177      2.093   0.563    0.287
+## 
+##  Log-Likelihood:  0.395 
+## 
+##  Summary: (mu in radians)
+##   mu:  -0.3499 ( 1.153 )  kappa:  0.2906 ( 0.3296 )
+## p-values are approximated using normal distribution</code></pre>
 </div>
 </div>
 
