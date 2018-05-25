@@ -1,0 +1,110 @@
+---
+title: "Circular Tutorial"
+author: "Kees Mulder"
+date: "May 25, 2018"
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Circular data 
+
+First, load the `circular` package:
+
+```{r}
+library(circular)
+library(ggplot2)
+```
+
+### Working with circular data
+
+A simple circular dataset is in the package, which has arrival times in an intensive care unit:
+
+```{r}
+fisherB1
+ggplot(data.frame(th = fisherB1)) + 
+  geom_histogram(aes(x = th, y = ..density..)) 
+```
+
+However, importantly, in order to work with it, we must tell the package that the data is in hours, otherwise all the analyses will be wrong:
+
+```{r}
+IC_times <- circular(fisherB1, units = "hours")
+plot(IC_times)
+```
+
+To obtain the mean direction, we use the sum of cosines (\(C = \sum_i \text{cos} (\theta_i) \)), sum of sines (\(S = \sum_i \text{sin} (\theta_i) \)) and \(R = \sqrt{C^2 + S^2} \), which is the square root of the sum of squared $C$ and $S$ values. The mean direction is then given by
+
+\begin{align}
+  \overline{\theta}  &= 
+    \begin{cases}
+      tan^{-1} (S/C)                   &  S > 0, C > 0\\ 
+      tan^{-1} (S/C) + \pi             &  C < 0\\ 
+      tan^{-1} (S/C) + 2\pi            &  S < 0, C > 0\\ 
+    \end{cases}
+    \text{, (Fisher, 1995)}
+\end{align}
+\
+
+In `R`, we can get it, but we have to take the modulus of 24 hours to make this interpretable:
+
+```{r}
+mean(IC_times)
+mean(IC_times) %% 24
+```
+
+### Using circular predictors
+
+Sometimes, we just want to predict a linear outcome $x$ with a circular predictor $\theta$. For example, look at this dataset:
+
+```{r}
+fisherB18
+```
+
+Then, we can just do:
+
+```{r}
+fisherB18$theta <- fisherB18$theta * pi / 180
+lmfit <- lm(x ~ cos(theta) + sin(theta), data = fisherB18)
+lmfit
+```
+
+
+
+### Fitting a distribution
+
+
+We can fit a simple distribution on this data:
+
+```{r}
+vm_mles <- mle.vonmises(IC_times)
+vm_mles
+```
+
+And we can see that the fit is fairly well:
+
+```{r}
+ggplot(data.frame(th = IC_times * pi / 12)) + 
+  geom_histogram(aes(x = th, y = ..density..)) + 
+  stat_function(fun = dvonmises, 
+                args = list(mu = vm_mles$mu, kappa = vm_mles$kappa),
+                col = "tomato")
+```
+
+
+
+
+
+### Circular outcome regression
+
+
+```{r}
+
+```
+
+
+
